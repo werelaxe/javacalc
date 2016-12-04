@@ -2,6 +2,7 @@ package calculator;
 
 import lexer.Lexer;
 import lexer.Token;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import vector.Vector;
 
 import java.util.ArrayList;
@@ -44,21 +45,18 @@ public class Calc {
         }
         return null;
     }
-    public static ArrayList<IProcessable> parse(ArrayList<Token> lexems) {
-        ArrayList<IProcessable> finalSummands = new ArrayList<>();
-        for (Token lexeme : lexems) {
-            if (!lexeme.getType().equals("whitespace")) {
-                if (lexeme.getType().equals("operator"))
-                    finalSummands.add(new Operator(lexeme.getSubType()));
-                if (lexeme.getType().equals("number")) {
-                    if (lexeme.getSubType().equals("real"))
-                        finalSummands.add(new Operand(Integer.parseInt(lexeme.getText()), 0, new HashSet<>()));
-                    if (lexeme.getSubType().equals("special"))
-                        finalSummands.add(new Operand(0, Integer.parseInt(lexeme.getText()), new HashSet<>()));
-                }
+    public static IProcessable parse(Token lexeme) {
+        if (!lexeme.getType().equals("whitespace")) {
+            if (lexeme.getType().equals("operator"))
+                return new Operator(lexeme.getSubType());
+            if (lexeme.getType().equals("number")) {
+                if (lexeme.getSubType().equals("real"))
+                    return new Operand(Integer.parseInt(lexeme.getText()), 0, new HashSet<>());
+                if (lexeme.getSubType().equals("special"))
+                    return new Operand(0, Integer.parseInt(lexeme.getText()), new HashSet<>());
             }
         }
-        return finalSummands;
+        throw new IllegalArgumentException();
     }
     public static void calculate(String source) {
         ArrayList<Token> objects = removeWhitespaces(source);
