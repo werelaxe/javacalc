@@ -24,28 +24,63 @@ public class Calc {
         }
         return finalLexems;
     }
-    public static ArrayList<Token> preParse(ArrayList<Token> lexems) {
-        ArrayList<Token> finalLexems = new ArrayList<>();
+    public static ArrayList<IProcessable> parseParentheses(ArrayList<Token> lexems) {
+        int dimCount = 0;
+        ArrayList<IProcessable> finalSummands = new ArrayList<>();
+        StringBuilder buffer = new StringBuilder();
+        for (Token t : lexems) {
+            if (t.getText().equals(",")) {
+                dimCount++;
+            }
+        }
+        if (dimCount == 0) {
+            for (Token t : lexems) {
+                finalSummands.add(parseToken(t));
+            }
+        }
+        else {
+            int[] coordinates = new int[dimCount + 1];
+            int currentCoordinate = 0;
+            for (Token t : lexems) {
+                if (t.getType().equals("number")) {
+                    coordinates[currentCoordinate] = Integer.parseInt(t.getText());
+                    currentCoordinate++;
+                }
+            }
+            HashSet<Vector> set = new HashSet<>();
+            set.add(new Vector(coordinates));
+            finalSummands.add(new Operand(0, 0, set));
+        }
+        return finalSummands;
+    }
+    public static ArrayList<IProcessable> parse(ArrayList<Token> lexems) {
+        ArrayList<IProcessable> finalSummonds = new ArrayList<>();
         int i = 0;
         while (i < lexems.size()){
             Token lexeme = lexems.get(i);
             if (lexeme.getSubType().equals("left_parenthesis")) {
-                System.out.println("\nStart process pereths");
+                //System.out.println("\nStart process");
+                ArrayList<Token> parTokens = new ArrayList<>();
                 Token currentLexeme = new Token("none", "none");
                 while (i != lexems.size() && !"right_parenthesis".equals(currentLexeme.getSubType())) {
                     currentLexeme = lexems.get(i);
-                    System.out.println(currentLexeme);
+                    parTokens.add(currentLexeme);
+                    //System.out.println(currentLexeme);
                     i++;
                 }
-                System.out.println("Finish process pereths\n");
+                //System.out.println("Finish process\n");
+                for (IProcessable bufferSummond:parseParentheses(parTokens)) {
+                    finalSummonds.add(bufferSummond);
+                }
             }
-            if (i != lexems.size())
-                System.out.println(lexems.get(i));
+            if (i != lexems.size()) {
+                    finalSummonds.add(parseToken(lexems.get(i)));
+                }
             i++;
         }
-        return null;
+        return finalSummonds;
     }
-    public static IProcessable parse(Token lexeme) {
+    public static IProcessable parseToken(Token lexeme) {
         if (!lexeme.getType().equals("whitespace")) {
             if (lexeme.getType().equals("operator"))
                 return new Operator(lexeme.getSubType());
@@ -59,7 +94,11 @@ public class Calc {
         throw new IllegalArgumentException();
     }
     public static void calculate(String source) {
-        ArrayList<Token> objects = removeWhitespaces(source);
-        preParse(objects);
+        System.out.println(String.format("SOURCE{%S}", source));
+        ArrayList<Token> lexems = removeWhitespaces(source + " =");
+        ArrayList<IProcessable> summonds = parse(lexems);
+        for(IProcessable s:summonds) {
+            System.out.println(s);
+        }
     }
 }

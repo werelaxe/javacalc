@@ -15,7 +15,7 @@ public class Program {
         } catch (FileNotFoundException e) {
             input = "2 + 2 * 2";
         }
-        System.out.println("Calculating " + input);
+        //System.out.println("Calculating " + input);
         Calc.calculate(input);
     }
 }

@@ -25,6 +25,10 @@ public class Operand implements IProcessable {
 
     @Override
     public String toString() {
-        return String.format("Operand(%s, %s, vectors)", real, imagine);
+        StringBuilder buffer = new StringBuilder();
+        for (Vector vector:vectors) {
+            buffer.append(vector);
+        }
+        return String.format("Operand(%s, %s, %s)", real, imagine, buffer.toString());
     }
 }
