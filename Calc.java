@@ -3,12 +3,9 @@ package calculator;
 import lexer.Lexer;
 import lexer.Token;
 import numbers.ComplexNumber;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import vector.Vector;
-
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.Stack;
 
 /**
@@ -43,12 +40,20 @@ public class Calc {
         } else {
             ComplexNumber[] coordinates = new ComplexNumber[dimCount + 1];
             int currentCoordinate = 0;
+            ArrayList<Token> lexBuffer = new ArrayList<>();
             for (Token t : lexems) {
-                if (t.getType().equals("number")) {
-                    coordinates[currentCoordinate] = ComplexNumber.parseComplexNumber(t.getText());
+                if (t.getText().equals("(") || t.getText().equals(")"))
+                    continue;
+                //System.out.println(t.getText());
+                if (t.getText().equals(",")) {
+                    coordinates[currentCoordinate] = evaluateWithoutParentheses(lexBuffer);
                     currentCoordinate++;
+                    lexBuffer.clear();
                 }
+                else
+                    lexBuffer.add(t);
             }
+            coordinates[currentCoordinate] = evaluateWithoutParentheses(lexBuffer);
             HashSet<Vector> set = new HashSet<>();
             set.add(new Vector(coordinates));
             finalSummands.add(new Operand(new ComplexNumber(0, 0), set));
@@ -71,17 +76,40 @@ public class Calc {
                     //System.out.println(currentLexeme);
                     i++;
                 }
-                //System.out.println("Finish process\n");
                 for (IProcessable bufferSummond : parseParentheses(parTokens)) {
-                    finalSummonds.add(bufferSummond);
+                    if (bufferSummond.isOperator()) {
+                        Operator operator = (Operator)bufferSummond;
+                        if (operator.type.equals("subtract")){
+                            finalSummonds.add(new Operator("add"));
+                            finalSummonds.add(new Operator("left_parenthesis"));
+                            finalSummonds.add(new Operand(new ComplexNumber(0, 0), new HashSet<Vector>()));
+                            finalSummonds.add(new Operator("subtract"));
+                            finalSummonds.add(new Operand(new ComplexNumber(1, 0), new HashSet<Vector>()));
+                            finalSummonds.add(new Operator("right_parenthesis"));
+                            finalSummonds.add(new Operator("multiply"));
+                        }
+                        else
+                            finalSummonds.add(bufferSummond);
+                    } else
+                        finalSummonds.add(bufferSummond);
                 }
             }
             if (i != lexems.size()) {
                 finalSummonds.add(parseToken(lexems.get(i)));
+                //System.out.println(parseToken(lexems.get(i)));
             }
             i++;
         }
         return finalSummonds;
+    }
+
+    public static ComplexNumber evaluateWithoutParentheses(ArrayList<Token> lexemes) {
+        ArrayList<IProcessable> summonds = new ArrayList<>();
+        for (Token lexeme:lexemes) {
+            summonds.add(parseToken(lexeme));
+        }
+        ArrayList<IProcessable> reversedSummonds = ReversePolishNotation.reverse(summonds);
+        return calculateExpression(reversedSummonds).getValue();
     }
 
     public static IProcessable parseToken(Token lexeme) {

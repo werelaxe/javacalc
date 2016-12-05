@@ -21,6 +21,9 @@ public class Operand implements IProcessable {
         }
     }
     private ComplexNumber value;
+    public ComplexNumber getValue() {
+        return value;
+    }
     public HashMap<Integer, Vector> vectors;
 
     public static Operand sum(Operand firstOperand, Operand secondOperand) {
