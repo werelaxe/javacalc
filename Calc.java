@@ -8,6 +8,7 @@ import vector.Vector;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Stack;
 
 /**
  * Created by melon on 05.12.16.
@@ -24,6 +25,7 @@ public class Calc {
         }
         return finalLexems;
     }
+
     public static ArrayList<IProcessable> parseParentheses(ArrayList<Token> lexems) {
         int dimCount = 0;
         ArrayList<IProcessable> finalSummands = new ArrayList<>();
@@ -37,8 +39,7 @@ public class Calc {
             for (Token t : lexems) {
                 finalSummands.add(parseToken(t));
             }
-        }
-        else {
+        } else {
             int[] coordinates = new int[dimCount + 1];
             int currentCoordinate = 0;
             for (Token t : lexems) {
@@ -53,10 +54,11 @@ public class Calc {
         }
         return finalSummands;
     }
+
     public static ArrayList<IProcessable> parse(ArrayList<Token> lexems) {
         ArrayList<IProcessable> finalSummonds = new ArrayList<>();
         int i = 0;
-        while (i < lexems.size()){
+        while (i < lexems.size()) {
             Token lexeme = lexems.get(i);
             if (lexeme.getSubType().equals("left_parenthesis")) {
                 //System.out.println("\nStart process");
@@ -69,17 +71,18 @@ public class Calc {
                     i++;
                 }
                 //System.out.println("Finish process\n");
-                for (IProcessable bufferSummond:parseParentheses(parTokens)) {
+                for (IProcessable bufferSummond : parseParentheses(parTokens)) {
                     finalSummonds.add(bufferSummond);
                 }
             }
             if (i != lexems.size()) {
-                    finalSummonds.add(parseToken(lexems.get(i)));
-                }
+                finalSummonds.add(parseToken(lexems.get(i)));
+            }
             i++;
         }
         return finalSummonds;
     }
+
     public static IProcessable parseToken(Token lexeme) {
         if (!lexeme.getType().equals("whitespace")) {
             if (lexeme.getType().equals("operator"))
@@ -93,10 +96,51 @@ public class Calc {
         }
         throw new IllegalArgumentException();
     }
+
+    public static Operand calculateExpression(ArrayList<IProcessable> reversedSummonds) {
+        Stack<IProcessable> processStack = new Stack<>();
+        for (IProcessable summond : reversedSummonds) {
+            if (!summond.isOperator()) {
+                processStack.push(summond);
+            } else {
+                Operator operator = (Operator) summond;
+                Operand firstOperand = (Operand) processStack.pop();
+                Operand secondOperand = (Operand) processStack.pop();
+                if (operator.type.equals("add"))
+                    processStack.push(Operand.sum(firstOperand, secondOperand));
+                if (operator.type.equals("multiply"))
+                    processStack.push(Operand.multiply(firstOperand, secondOperand));
+                if (operator.type.equals("subtract"))
+                    processStack.push(Operand.subtract(secondOperand, firstOperand));
+                if (operator.type.equals("int_div")) {
+                    processStack.push(Operand.intDiv(secondOperand, firstOperand));
+                }
+            }
+        }
+        return (Operand) processStack.pop();
+    }
+
+    public static String processSource(String source) {
+        return source + " =";
+    }
+
     public static void calculate(String source) {
-        System.out.println(String.format("SOURCE{%S}", source));
-        ArrayList<Token> lexems = removeWhitespaces(source + " =");
+        System.out.println(String.format("Source: {%s}", source));
+
+        ArrayList<Token> lexems = removeWhitespaces(processSource(source));
+
+        System.out.println(String.format("Lexems: %s", lexems));
+
         ArrayList<IProcessable> summonds = parse(lexems);
+
+        System.out.println(String.format("Summonds: %s", summonds));
+
         ArrayList<IProcessable> reversedSummonds = ReversePolishNotation.reverse(summonds);
+
+        System.out.println(String.format("Reversed summonds: %s", reversedSummonds));
+
+        Operand result = calculateExpression(reversedSummonds);
+
+        System.out.println(String.format("Result: %s", result));
     }
 }
