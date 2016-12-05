@@ -49,8 +49,7 @@ public class Calc {
                     coordinates[currentCoordinate] = evaluateWithoutParentheses(lexBuffer);
                     currentCoordinate++;
                     lexBuffer.clear();
-                }
-                else
+                } else
                     lexBuffer.add(t);
             }
             coordinates[currentCoordinate] = evaluateWithoutParentheses(lexBuffer);
@@ -78,8 +77,8 @@ public class Calc {
                 }
                 for (IProcessable bufferSummond : parseParentheses(parTokens)) {
                     if (bufferSummond.isOperator()) {
-                        Operator operator = (Operator)bufferSummond;
-                        if (operator.type.equals("subtract")){
+                        Operator operator = (Operator) bufferSummond;
+                        if (operator.type.equals("subtract")) {
                             finalSummonds.add(new Operator("add"));
                             finalSummonds.add(new Operator("left_parenthesis"));
                             finalSummonds.add(new Operand(new ComplexNumber(0, 0), new HashSet<Vector>()));
@@ -87,8 +86,7 @@ public class Calc {
                             finalSummonds.add(new Operand(new ComplexNumber(1, 0), new HashSet<Vector>()));
                             finalSummonds.add(new Operator("right_parenthesis"));
                             finalSummonds.add(new Operator("multiply"));
-                        }
-                        else
+                        } else
                             finalSummonds.add(bufferSummond);
                     } else
                         finalSummonds.add(bufferSummond);
@@ -105,7 +103,7 @@ public class Calc {
 
     public static ComplexNumber evaluateWithoutParentheses(ArrayList<Token> lexemes) {
         ArrayList<IProcessable> summonds = new ArrayList<>();
-        for (Token lexeme:lexemes) {
+        for (Token lexeme : lexemes) {
             summonds.add(parseToken(lexeme));
         }
         ArrayList<IProcessable> reversedSummonds = ReversePolishNotation.reverse(summonds);
@@ -153,23 +151,16 @@ public class Calc {
         return source + " =";
     }
 
-    public static void calculate(String source) {
-        System.out.println(String.format("Source: {%s}", source));
-
+    public static Operand calculate(String source) {
+        //System.out.println(String.format("Source: {%s}", source));
         ArrayList<Token> lexems = removeWhitespaces(processSource(source));
-
-        System.out.println(String.format("Lexems: %s", lexems));
-
+        //System.out.println(String.format("Lexems: %s", lexems));
         ArrayList<IProcessable> summonds = parse(lexems);
-
-        System.out.println(String.format("Summonds: %s", summonds));
-
+        //System.out.println(String.format("Summonds: %s", summonds));
         ArrayList<IProcessable> reversedSummonds = ReversePolishNotation.reverse(summonds);
-
-        System.out.println(String.format("Reversed summonds: %s", reversedSummonds));
-
+        //System.out.println(String.format("Reversed summonds: %s", reversedSummonds));
         Operand result = calculateExpression(reversedSummonds);
-
-        System.out.println(String.format("Result: %s", result));
+        //System.out.println(String.format("Result: %s", result));
+        return result;
     }
 }

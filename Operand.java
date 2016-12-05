@@ -20,10 +20,13 @@ public class Operand implements IProcessable {
             this.vectors.put(v.getDimCount(), v);
         }
     }
+
     private ComplexNumber value;
+
     public ComplexNumber getValue() {
         return value;
     }
+
     public HashMap<Integer, Vector> vectors;
 
     public static Operand sum(Operand firstOperand, Operand secondOperand) {
@@ -81,8 +84,8 @@ public class Operand implements IProcessable {
                 throw new IllegalArgumentException();
             ComplexNumber result = firstOperand.value.mul(secondOperand.value);
 
-            for (Vector vec1:firstOperand.vectors.values())
-                for (Vector vec2:secondOperand.vectors.values()) {
+            for (Vector vec1 : firstOperand.vectors.values())
+                for (Vector vec2 : secondOperand.vectors.values()) {
                     result = result.add(vec1.scalarProduct(vec2));
                 }
             return new Operand(result, new HashSet<>());
@@ -111,13 +114,15 @@ public class Operand implements IProcessable {
             }
         }
     }
+
     public static Operand intDiv(Operand firstOperand, Operand secondOperand) {
         HashSet<Vector> vectors = new HashSet<>();
         for (Vector vec : firstOperand.vectors.values()) {
             vectors.add(vec.intDiv(secondOperand.value));
         }
-        return new Operand(firstOperand.value .div(secondOperand.value), vectors);
+        return new Operand(firstOperand.value.div(secondOperand.value), vectors);
     }
+
     @Override
     public boolean isOperator() {
         return false;

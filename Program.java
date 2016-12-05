@@ -1,11 +1,10 @@
 package calculator;
 
-import numbers.ComplexNumber;
 import vector.Vector;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -19,7 +18,16 @@ public class Program {
         } catch (FileNotFoundException e) {
             input = "2 + 2 * 2";
         }
-        //System.out.println("Calculating " + input);
-        Calc.calculate(input);
+        Operand result = Calc.calculate(input);
+        System.out.println("Input = " + input);
+        System.out.print("Output = " + result.getValue() + " + ");
+        ArrayList<Integer> sizes = new ArrayList<>();
+        for (int size : result.vectors.keySet()) {
+            sizes.add(size);
+        }
+        for (int i = 0; i < sizes.size() - 1; i++) {
+            System.out.print(result.vectors.get(sizes.get(i)).toSimpleString() + " + ");
+        }
+        System.out.print(result.vectors.get(sizes.get(sizes.size() - 1)).toSimpleString());
     }
 }
