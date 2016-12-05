@@ -23,6 +23,7 @@ public class Program {
         HashSet<Vector> vectors1 = new HashSet<>();
         vectors1.add(new Vector(new int[]{3, 1}));
         vectors1.add(new Vector(new int[]{3, 1, 0}));
+        vectors1.add(new Vector(new int[]{4, 5, 6, 3}));
 
         HashSet<Vector> vectors2 = new HashSet<>();
         vectors2.add(new Vector(new int[]{4, 5, 6}));
