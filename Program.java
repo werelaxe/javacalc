@@ -1,5 +1,6 @@
 package calculator;
 
+import numbers.ComplexNumber;
 import vector.Vector;
 
 import java.io.File;
@@ -20,8 +21,5 @@ public class Program {
         }
         //System.out.println("Calculating " + input);
         Calc.calculate(input);
-        HashSet<Vector> vectors = new HashSet<>();
-        vectors.add(new Vector(new int[]{3, 6, 8}));
-        Operand op = new Operand(10, 2, vectors);
     }
 }

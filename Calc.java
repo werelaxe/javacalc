@@ -2,6 +2,7 @@ package calculator;
 
 import lexer.Lexer;
 import lexer.Token;
+import numbers.ComplexNumber;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import vector.Vector;
 
@@ -40,17 +41,17 @@ public class Calc {
                 finalSummands.add(parseToken(t));
             }
         } else {
-            int[] coordinates = new int[dimCount + 1];
+            ComplexNumber[] coordinates = new ComplexNumber[dimCount + 1];
             int currentCoordinate = 0;
             for (Token t : lexems) {
                 if (t.getType().equals("number")) {
-                    coordinates[currentCoordinate] = Integer.parseInt(t.getText());
+                    coordinates[currentCoordinate] = ComplexNumber.parseComplexNumber(t.getText());
                     currentCoordinate++;
                 }
             }
             HashSet<Vector> set = new HashSet<>();
             set.add(new Vector(coordinates));
-            finalSummands.add(new Operand(0, 0, set));
+            finalSummands.add(new Operand(new ComplexNumber(0, 0), set));
         }
         return finalSummands;
     }
@@ -89,9 +90,9 @@ public class Calc {
                 return new Operator(lexeme.getSubType());
             if (lexeme.getType().equals("number")) {
                 if (lexeme.getSubType().equals("real"))
-                    return new Operand(Integer.parseInt(lexeme.getText()), 0, new HashSet<>());
+                    return new Operand(new ComplexNumber(Integer.parseInt(lexeme.getText()), 0), new HashSet<>());
                 if (lexeme.getSubType().equals("special"))
-                    return new Operand(0, Integer.parseInt(lexeme.getText()), new HashSet<>());
+                    return new Operand(new ComplexNumber(0, Integer.parseInt(lexeme.getText())), new HashSet<>());
             }
         }
         throw new IllegalArgumentException();
