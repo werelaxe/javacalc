@@ -34,7 +34,8 @@ public class Operand implements IProcessable {
             } else {
                 Vector second = secondOperand.vectors.get(vec.getDimCount());
                 Vector finalVector = vec.add(second);
-                vectors.add(finalVector);
+                if (!finalVector.isZeroVector())
+                    vectors.add(finalVector);
             }
         }
         for (Vector vec : secondOperand.vectors.values()) {
@@ -45,6 +46,63 @@ public class Operand implements IProcessable {
         return new Operand(newReal, newImagine, vectors);
     }
 
+    public static Operand subtract(Operand firstOperand, Operand secondOperand) {
+        int newReal = firstOperand.real - secondOperand.real;
+        int newImagine = firstOperand.imagine - secondOperand.imagine;
+        HashSet<Vector> vectors = new HashSet<>();
+        for (Vector vec : firstOperand.vectors.values()) {
+            if (!secondOperand.vectors.keySet().contains(vec.getDimCount())) {
+                vectors.add(vec);
+            } else {
+                Vector second = secondOperand.vectors.get(vec.getDimCount());
+                Vector finalVector = vec.subtract(second);
+                if (!finalVector.isZeroVector()) {
+                    vectors.add(finalVector);
+                }
+            }
+        }
+        for (Vector vec : secondOperand.vectors.values()) {
+            if (!firstOperand.vectors.keySet().contains(vec.getDimCount())) {
+                vectors.add(vec.multiply(-1));
+            }
+        }
+        return new Operand(newReal, newImagine, vectors);
+    }
+
+    public static Operand multiply(Operand firstOperand, Operand secondOperand) {
+        if (firstOperand.vectors.isEmpty()) {
+            if (secondOperand.vectors.isEmpty()) {
+                return new Operand(firstOperand.real * secondOperand.real - firstOperand.imagine * secondOperand.imagine,
+                        firstOperand.real * secondOperand.imagine + firstOperand.imagine * secondOperand.real,
+                        new HashSet<>());
+            } else {
+                HashSet<Vector> vectors = new HashSet<>();
+                for (Vector vec : secondOperand.vectors.values()) {
+                    vectors.add(vec.multiply(firstOperand.real));
+                }
+                return new Operand(secondOperand.real * firstOperand.real,
+                        secondOperand.imagine * firstOperand.real,
+                        vectors);
+            }
+        } else {
+            HashSet<Vector> vectors = new HashSet<>();
+            for (Vector vec : firstOperand.vectors.values()) {
+                vectors.add(vec.multiply(secondOperand.real));
+            }
+            return new Operand(firstOperand.real * secondOperand.real,
+                    firstOperand.imagine * secondOperand.real,
+                    vectors);
+        }
+    }
+    public static Operand intDiv(Operand firstOperand, Operand secondOperand) {
+        HashSet<Vector> vectors = new HashSet<>();
+        for (Vector vec : firstOperand.vectors.values()) {
+            vectors.add(vec.intDiv(secondOperand.real));
+        }
+        return new Operand(firstOperand.real / secondOperand.real,
+                firstOperand.imagine / secondOperand.real,
+                vectors);
+    }
     @Override
     public boolean isOperator() {
         return false;
@@ -58,6 +116,9 @@ public class Operand implements IProcessable {
             buffer.append(" ");
         }
         String result = buffer.toString();
-        return String.format("Operand(%s, %s, %s)", real, imagine, result.substring(0, result.length() - 1));
+        if (!buffer.toString().equals(""))
+            return String.format("Operand(%s, %s, %s)", real, imagine, result.substring(0, result.length() - 1));
+        else
+            return String.format("Operand(%s, %s, {})", real, imagine);
     }
 }

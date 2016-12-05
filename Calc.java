@@ -97,8 +97,6 @@ public class Calc {
         System.out.println(String.format("SOURCE{%S}", source));
         ArrayList<Token> lexems = removeWhitespaces(source + " =");
         ArrayList<IProcessable> summonds = parse(lexems);
-        for(IProcessable s:summonds) {
-            System.out.println(s);
-        }
+        ArrayList<IProcessable> reversedSummonds = ReversePolishNotation.reverse(summonds);
     }
 }
