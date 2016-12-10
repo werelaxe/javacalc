@@ -3,6 +3,7 @@ package calculator;
 import lexer.Lexer;
 import lexer.Token;
 import numbers.ComplexNumber;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import vector.Vector;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -16,10 +17,25 @@ public class Calc {
         Lexer lexer = new Lexer();
         lexer.register("math", new MathGrammar());
         ArrayList<Token> lexems = lexer.getLexems("math", source);
+        ArrayList<Token> withoutWhitespaces = new ArrayList<>();
         ArrayList<Token> finalLexems = new ArrayList<>();
         for (Token lexeme : lexems) {
             if (!lexeme.getType().equals("whitespace"))
-                finalLexems.add(lexeme);
+                withoutWhitespaces.add(lexeme);
+        }
+        System.out.println(withoutWhitespaces);
+        for (int i = 0; i < withoutWhitespaces.size(); i++) {
+            Token lexeme = withoutWhitespaces.get(i);
+            //System.out.println(lexeme.getSubType());
+            if (lexeme.getSubType().equals("subtract")) {
+                if (finalLexems.size() == 0)
+                    finalLexems.add(new Token("0", "number", "real"));
+                else {
+                    if (withoutWhitespaces.get(i - 1).getText().equals(",") || withoutWhitespaces.get(i - 1).getText().equals("("))
+                        finalLexems.add(new Token("0", "number", "real"));
+                }
+            }
+            finalLexems.add(lexeme);
         }
         return finalLexems;
     }
@@ -88,7 +104,6 @@ public class Calc {
                 System.out.println("deep: " + deep);
                 for (IProcessable bufferSummond : parseParentheses(parTokens)) {
                     if (bufferSummond.isOperator()) {
-                        Operator operator = (Operator) bufferSummond;
                         finalSummonds.add(bufferSummond);
                     } else
                         finalSummonds.add(bufferSummond);
