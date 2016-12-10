@@ -14,7 +14,7 @@ public class ReversePolishNotation {
         for (IProcessable summond : summonds) {
             if (!summond.isOperator())
                 outputExpression.add(summond);
-            else { //Если оператор
+            else {
                 Operator summonOperator = ((Operator) summond);
                 if (summonOperator.type.equals("left_parenthesis"))
                     operStack.push((Operator) summond);

@@ -69,25 +69,27 @@ public class Calc {
                 //System.out.println("\nStart process");
                 ArrayList<Token> parTokens = new ArrayList<>();
                 Token currentLexeme = new Token("none", "none");
-                while (i != lexems.size() && !"right_parenthesis".equals(currentLexeme.getSubType())) {
+                int deep = 0;
+                while (i != lexems.size()) {
+                    if ("right_parenthesis".equals(currentLexeme.getSubType())) {
+                        if (deep == 1)
+                            break;
+                        else
+                            deep--;
+                    }
+                    if (currentLexeme.getSubType().equals("left_parenthesis"))
+                        deep++;
                     currentLexeme = lexems.get(i);
                     parTokens.add(currentLexeme);
                     //System.out.println(currentLexeme);
                     i++;
                 }
+                System.out.println("par tokens: " + parTokens);
+                System.out.println("deep: " + deep);
                 for (IProcessable bufferSummond : parseParentheses(parTokens)) {
                     if (bufferSummond.isOperator()) {
                         Operator operator = (Operator) bufferSummond;
-                        if (operator.type.equals("subtract")) {
-                            finalSummonds.add(new Operator("add"));
-                            finalSummonds.add(new Operator("left_parenthesis"));
-                            finalSummonds.add(new Operand(new ComplexNumber(0, 0), new HashSet<Vector>()));
-                            finalSummonds.add(new Operator("subtract"));
-                            finalSummonds.add(new Operand(new ComplexNumber(1, 0), new HashSet<Vector>()));
-                            finalSummonds.add(new Operator("right_parenthesis"));
-                            finalSummonds.add(new Operator("multiply"));
-                        } else
-                            finalSummonds.add(bufferSummond);
+                        finalSummonds.add(bufferSummond);
                     } else
                         finalSummonds.add(bufferSummond);
                 }
